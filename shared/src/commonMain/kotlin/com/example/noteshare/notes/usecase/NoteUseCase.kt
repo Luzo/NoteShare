@@ -9,7 +9,7 @@ class LoadNotesUseCase {
         // simulate loading
         delay(1500)
 
-        val numberOfItems = Random.nextInt(from =  0, until = 10)
+        val numberOfItems = Random.nextInt(from =  0, until = 100)
         return List(numberOfItems) { index ->
             val title = titles.random()
             Note(
