@@ -54,3 +54,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
+dependencies {
+    implementation(libs.identity.jvm)
+}

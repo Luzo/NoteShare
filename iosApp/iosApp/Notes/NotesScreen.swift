@@ -2,27 +2,16 @@ import SwiftUI
 import shared
 
 class NoteViewModelAdapter: ObservableObject {
-  @Published var state: NoteState = NoteState.companion.Loading
+  @Published var state: NoteState
   private let viewModel: NoteViewModel
 
   init(viewModel: NoteViewModel) {
+    self.state = .Loading(mockedNotes: [])
     self.viewModel = viewModel
 
     viewModel.collectState { state in
-      self.state = state.transformLoadingState()
+      self.state = state
     }
-  }
-}
-
-// TODO: probably move to shared
-private extension NoteState {
-  func transformLoadingState()  -> NoteState {
-    if isLoading {
-
-      return .init(notes: [.mock, .mock, .mock], isLoading: true, errorMessage: nil)
-    }
-
-    return self
   }
 }
 
@@ -41,22 +30,27 @@ struct NotesScreen: View {
   var body: some View {
     ZStack(alignment: .bottom) {
       VStack {
-        Group {
-          if !viewModel.state.notes.isEmpty {
-            NotesListView(viewModel: .init(notes: viewModel.state.notes))
-              .redacted(reason: viewModel.state.isLoading ? .placeholder : [])
-          } else {
-            Text("No notes available.")
-              .font(.subheadline)
-              .foregroundColor(.gray)
-              .padding()
-          }
-        }
+        switch viewModel.state {
+        case let loadingState as NoteState.Loading:
+          NotesListView(viewModel: .init(notes: loadingState.mockedNotes))
+            .redacted(reason: .placeholder)
 
-        if let errorMessage = viewModel.state.errorMessage {
-          Text(errorMessage)
+        case let loadedState as NoteState.Loaded where !loadedState.notes.isEmpty:
+          NotesListView(viewModel: .init(notes: loadedState.notes))
+
+        case let loadedState as NoteState.Loaded where loadedState.notes.isEmpty:
+          Text("No notes available.")
+            .font(.subheadline)
+            .foregroundColor(.gray)
+            .padding()
+
+        case let errorState as NoteState.Error:
+          Text(errorState.errorMessage)
             .foregroundColor(.red)
             .padding()
+            
+        default:
+          EmptyView()
         }
 
         Spacer()
