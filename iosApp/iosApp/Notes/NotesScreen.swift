@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 import shared
 
@@ -10,78 +11,86 @@ class NoteViewModelAdapter: ObservableObject {
     self.viewModel = viewModel
 
     viewModel.collectState { state in
-      self.state = state
+      self.state = state.transform
     }
+  }
+}
+
+// TODO: this is here just for quick debug, remove later
+private extension NoteState {
+  var transform: NoteState {
+    if self is NoteState.Loading {
+      return self
+    }
+
+    return self
+//    return NoteState.Error(errorMessage: "Not loaded")
+//    return NoteState.Loaded(notes: [])
   }
 }
 
 extension NoteViewModelAdapter {
-  func loadNotes() {
+  func loadNotes() async {
     viewModel.onIntent(intent: NoteIntent.LoadNotes())
+    await checkLoaded()
+  }
+
+  private func checkLoaded() async {
+    if state is NoteState.Loading {
+      try? await Task.sleep(for: .seconds(1))
+      await checkLoaded()
+    }
+
+    try? await Task.sleep(for: .seconds(1))
   }
 }
-
-import SwiftUI
-import shared
 
 struct NotesScreen: View {
-  @ObservedObject private var viewModel: NoteViewModelAdapter = .init(viewModel: .init(loadNotesUseCase: .init()))
+  @ObservedObject var viewModel: NoteViewModelAdapter
 
   var body: some View {
-    ZStack(alignment: .bottom) {
-      VStack {
-        switch viewModel.state {
-        case let loadingState as NoteState.Loading:
-          NotesListView(viewModel: .init(notes: loadingState.mockedNotes))
-            .redacted(reason: .placeholder)
+    NavigationStack {
+      ZStack(alignment: .bottom) {
+        List {
+          switch viewModel.state {
+          case let loadingState as NoteState.Loading:
+            NotesListView(viewModel: .init(notes: loadingState.mockedNotes))
+              .redacted(reason: .placeholder)
 
-        case let loadedState as NoteState.Loaded where !loadedState.notes.isEmpty:
-          NotesListView(viewModel: .init(notes: loadedState.notes))
+          case let loadedState as NoteState.Loaded:
+            NotesListView(viewModel: .init(notes: loadedState.notes))
 
-        case let loadedState as NoteState.Loaded where loadedState.notes.isEmpty:
-          Text("No notes available.")
-            .font(.subheadline)
-            .foregroundColor(.gray)
-            .padding()
+          case let errorState as NoteState.Error:
+            Text(errorState.errorMessage)
+              .foregroundColor(.red)
+              .asStaticItem()
 
-        case let errorState as NoteState.Error:
-          Text(errorState.errorMessage)
-            .foregroundColor(.red)
-            .padding()
-            
-        default:
-          EmptyView()
+          default:
+            EmptyView()
+          }
         }
-
-        Spacer()
       }
-
-      Button(action: {
-        viewModel.loadNotes()
-      }) {
-        Text("Reload")
-          .frame(maxWidth: .infinity)
-          .padding()
-          .background(Color.blue)
-          .foregroundColor(.white)
-          .cornerRadius(8)
+      .onAppear {
+        Task {
+          await viewModel.loadNotes()
+        }
       }
-      .padding()
-      .padding(.top, 16)
-      .background(
-        LinearGradient(gradient: Gradient(colors: [.white.opacity(0.6), .white, .white]), startPoint: .top, endPoint: .bottom)
-      )
+      .refreshable {
+        await viewModel.loadNotes()
+      }
+      .navigationTitle("Your notes")
+      .toolbar {
+        Button(action: {
+          // TODO: add item
+        }) {
+          Image(systemName: "plus")
+            .padding(4)
+            .background(Color.blue)
+            .foregroundColor(.white)
+            .clipShape(Circle())
+        }
+      }
     }
-    .onAppear {
-      viewModel.loadNotes()
-    }
-  }
-}
-
-
-struct MainScreen_Previews: PreviewProvider {
-  static var previews: some View {
-    NotesScreen()
   }
 }
 

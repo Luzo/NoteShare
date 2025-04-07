@@ -1,8 +1,10 @@
-@file:OptIn(ExperimentalWearMaterialApi::class)
+@file:OptIn(ExperimentalWearMaterialApi::class, ExperimentalMaterial3Api::class)
 
 package com.example.noteshare.android.notes
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -13,6 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -27,7 +35,38 @@ import com.example.noteshare.notes.presentation.NoteViewModel
 
 @Composable
 fun MainScreen(viewModel: NoteViewModel) {
-    ContentView(modifier = Modifier.padding(top = 56.dp), viewModel = viewModel)
+    Scaffold(
+        topBar = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .padding(horizontal = 8.dp)
+                    .padding(bottom = 8.dp)
+            ) {
+                Text(
+                    "Your notes",
+                    style = MaterialTheme.typography.displaySmall,
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Button(
+                    modifier = Modifier.size(40.dp),
+                    onClick = { },
+                    shape = RoundedCornerShape(20.dp),
+                    contentPadding = PaddingValues(5.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "Add Note"
+                    )
+                }
+            }
+        },
+    ) { paddingValues ->
+        ContentView(modifier = Modifier.padding(paddingValues), viewModel = viewModel)
+    }
 }
 
 // TODO: This does not seem right, but I could not find any info about non 3rd party solution
@@ -35,90 +74,64 @@ fun MainScreen(viewModel: NoteViewModel) {
 @Composable
 fun ContentView(modifier: Modifier = Modifier, viewModel: NoteViewModel) {
     val state by viewModel.state.collectAsState()
-    val loading = rememberPlaceholderState { !(state is NoteState.Loading) }
     LaunchedEffect(Unit) {
         viewModel.onIntent(NoteIntent.LoadNotes)
     }
 
-    LaunchedEffect(loading) {
-        loading.startPlaceholderAnimation()
-    }
-    Column(
-        modifier = modifier
-            .fillMaxSize()
+    PullToRefreshBox(
+        modifier = modifier,
+        isRefreshing = state is NoteState.Loading,
+        contentAlignment = Alignment.BottomEnd,
+        onRefresh = {
+            // TODO: currently it masks views while loading - do this only for first fetch
+            viewModel.onIntent(NoteIntent.LoadNotes)
+        },
     ) {
-        when (val currentState = state) {
-            is NoteState.Loading -> {
-                LoadingNotesListView(
-                    notes = currentState.mockedNotes
-                )
-            }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            when (val currentState = state) {
+                is NoteState.Loading -> {
+                    LoadingNotesListView(
+                        notes = currentState.mockedNotes
+                    )
+                }
 
-            is NoteState.Loaded -> {
-                if (currentState.notes.isEmpty()) {
+                is NoteState.Loaded -> {
+
+                    if (currentState.notes.isEmpty()) {
+                        Text(
+                            "No notes available.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    } else {
+                        NotesListView(notes = currentState.notes)
+                    }
+                }
+
+                is NoteState.Error -> {
                     Text(
-                        "No notes available.",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.Gray,
+                        currentState.errorMessage,
+                        color = Color.Red,
                         modifier = Modifier.padding(16.dp)
                     )
-                } else {
-                    NotesListView(notes = currentState.notes)
                 }
-            }
 
-            is NoteState.Error -> {
-                Text(
-                    currentState.errorMessage,
-                    color = Color.Red,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+                else -> {
 
-            else -> {
-
-            }
-        }
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .zIndex(2f)
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-
-        Box(modifier = Modifier
-            .background(
-                Brush.verticalGradient(
-                    0.0f to Color.White.copy(alpha = 0.6f),
-                    1.0f to Color.White,
-                    startY = 0.0f,
-                    endY = 100.0f
-                )
-            )
-        ) {
-            Button(
-                onClick = { viewModel.onIntent(NoteIntent.LoadNotes) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .padding(vertical = 32.dp)
-                ,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Blue
-                )
-            ) {
-                Text(text = "Reload", color = Color.White)
+                }
             }
         }
     }
 }
 
 @Composable
-fun LoadingNotesListView(notes: List<Note>) {
+fun LoadingNotesListView(modifier: Modifier = Modifier, notes: List<Note>) {
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 8.dp)
         ,
