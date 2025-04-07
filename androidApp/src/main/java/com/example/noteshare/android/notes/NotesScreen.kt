@@ -1,4 +1,6 @@
-package com.example.noteshare.android
+@file:OptIn(ExperimentalWearMaterialApi::class)
+
+package com.example.noteshare.android.notes
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,6 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.zIndex
+import androidx.wear.compose.material.ExperimentalWearMaterialApi
+import androidx.wear.compose.material.placeholder
+import androidx.wear.compose.material.rememberPlaceholderState
 import com.example.noteshare.notes.model.Note
 import com.example.noteshare.notes.model.NoteState
 import com.example.noteshare.notes.presentation.NoteIntent
@@ -25,29 +30,28 @@ fun MainScreen(viewModel: NoteViewModel) {
     ContentView(modifier = Modifier.padding(top = 56.dp), viewModel = viewModel)
 }
 
+// TODO: This does not seem right, but I could not find any info about non 3rd party solution
+@OptIn(ExperimentalWearMaterialApi::class)
 @Composable
 fun ContentView(modifier: Modifier = Modifier, viewModel: NoteViewModel) {
     val state by viewModel.state.collectAsState()
-
+    val loading = rememberPlaceholderState { !(state is NoteState.Loading) }
     LaunchedEffect(Unit) {
         viewModel.onIntent(NoteIntent.LoadNotes)
     }
 
+    LaunchedEffect(loading) {
+        loading.startPlaceholderAnimation()
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
     ) {
         when (val currentState = state) {
             is NoteState.Loading -> {
-                repeat(currentState.mockedNotes.count()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(60.dp)
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                            .background(Color.LightGray.copy(alpha = 0.5f))
-                    )
-                }
+                LoadingNotesListView(
+                    notes = currentState.mockedNotes
+                )
             }
 
             is NoteState.Loaded -> {
@@ -112,6 +116,22 @@ fun ContentView(modifier: Modifier = Modifier, viewModel: NoteViewModel) {
 }
 
 @Composable
+fun LoadingNotesListView(notes: List<Note>) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 8.dp)
+        ,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        items(notes) { note ->
+            NoteItem(true, note)
+        }
+    }
+}
+
+@Composable
 fun NotesListView(notes: List<Note>) {
     LazyColumn(
         modifier = Modifier
@@ -122,13 +142,13 @@ fun NotesListView(notes: List<Note>) {
         horizontalAlignment = Alignment.Start
     ) {
         items(notes) { note ->
-            NoteItem(note)
+            NoteItem(isLoading = false, note)
         }
     }
 }
 
 @Composable
-fun NoteItem(note: Note) {
+fun NoteItem(isLoading: Boolean, note: Note) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -142,20 +162,20 @@ fun NoteItem(note: Note) {
             horizontalAlignment = Alignment.Start
         ) {
             Text(
+                modifier = Modifier.placeholder(
+                    placeholderState = rememberPlaceholderState { !isLoading }
+                ),
                 text = note.title,
                 style = MaterialTheme.typography.titleMedium,
             )
 
             Text(
+                modifier = Modifier.placeholder(
+                    placeholderState = rememberPlaceholderState { !isLoading }
+                ),
                 text = note.text,
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
     }
 }
-
-//@Preview
-//@Composable
-//fun NotesScreenPreview() {
-//    NotesScreen(viewModel = NoteViewModel())
-//}
