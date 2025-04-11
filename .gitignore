@@ -37,3 +37,5 @@ captures
 .cxx
 local.properties
 xcuserdata
+iosApp/iosApp/GoogleService-Info.plist
+androidApp/src/google-services.json
