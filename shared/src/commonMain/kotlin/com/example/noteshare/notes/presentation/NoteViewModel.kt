@@ -1,15 +1,14 @@
 package com.example.noteshare.notes.presentation
+import com.example.noteshare.firebase.FirebaseWrapper
 import com.example.noteshare.notes.model.Note
 import com.example.noteshare.notes.model.NoteState
 import com.example.noteshare.notes.usecase.LoadNotesUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class NoteViewModel(

@@ -1,6 +1,10 @@
 [versions]
 agp = "8.9.1"
+firebaseBom = "30.0.1"
+firebaseCommonKtx = "20.3.3"
+firebaseFirestore = "1.8.1"
 foundation = "1.7.8"
+googleServices = "4.3.15"
 kotlin = "2.1.0"
 compose = "1.5.4"
 compose-material3 = "1.1.2"
@@ -8,6 +12,7 @@ androidx-activityCompose = "1.8.0"
 kotlinxCoroutinesCore = "1.10.1"
 kotlinxCoroutinesCoreIos = "1.6.0"
 kotlinxCoroutinesCoreVersion = "1.6.0"
+kotlinxSerializationJson = "1.5.1"
 kotlinxUuidCore = "0.0.5"
 lifecycleViewmodelAndroid = "2.8.7"
 composeMaterial = "1.4.1"
@@ -19,6 +24,12 @@ identityJvm = "202411.1"
 androidx-foundation-v178 = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }
 androidx-material3-v131 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 androidx-ui-tooling-v150 = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseFirestore" }
+firebase-common-ktx = { module = "com.google.firebase:firebase-common-ktx", version.ref = "firebaseCommonKtx" }
+firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebaseFirestore" }
+firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx" }
+google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 jetbrains-kotlinx-coroutines-core-ios = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-ios", version.ref = "kotlinxCoroutinesCoreIos" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -32,6 +43,7 @@ androidx-compose-material = { group = "androidx.wear.compose", name = "compose-m
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 kotlinx-coroutines-core-v160 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCoreVersion" }
 identity-jvm = { group = "com.android.identity", name = "identity-jvm", version.ref = "identityJvm" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 kotlinx-uuid-core = { module = "org.jetbrains.kotlinx:kotlinx-uuid-core", version.ref = "kotlinxUuidCore" }
 
 [plugins]

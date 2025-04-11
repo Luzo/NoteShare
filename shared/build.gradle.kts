@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("multiplatform") version "2.1.0"
+    kotlin("plugin.serialization") version "2.1.0"
     alias(libs.plugins.androidLibrary)
 }
 
@@ -30,6 +31,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.firebase.firestore)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -39,6 +42,10 @@ kotlin {
             implementation(libs.androidx.material3.v131)
             implementation(libs.androidx.ui.tooling.v150)
             implementation(libs.androidx.lifecycle.viewmodel.android)
+            implementation(libs.firebase.firestore.ktx)
+        }
+        iosMain.dependencies {
+            implementation(libs.firebase.firestore)
         }
     }
 }
