@@ -1,10 +1,7 @@
 @file:OptIn(ExperimentalWearMaterialApi::class, ExperimentalMaterial3Api::class)
 
-package com.example.noteshare.android.notes
+package com.example.noteshare.android.notes.list
 
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -15,26 +12,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.zIndex
+import androidx.navigation.NavHostController
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import androidx.wear.compose.material.placeholder
 import androidx.wear.compose.material.rememberPlaceholderState
+import com.example.noteshare.android.NoteRoute
 import com.example.noteshare.notes.model.Note
-import com.example.noteshare.notes.model.NoteState
-import com.example.noteshare.notes.presentation.NoteIntent
-import com.example.noteshare.notes.presentation.NoteViewModel
+import com.example.noteshare.notes.list.model.NoteListState
+import com.example.noteshare.notes.list.presentation.NoteListIntent
+import com.example.noteshare.notes.list.presentation.NoteListViewModel
+import androidx.compose.runtime.DisposableEffect
 
 @Composable
-fun MainScreen(viewModel: NoteViewModel) {
+fun NotesScreen(viewModel: NoteListViewModel, router: NavHostController) {
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.cancelScope()
+        }
+    }
+
     Scaffold(
         topBar = {
             Row(
@@ -53,7 +55,9 @@ fun MainScreen(viewModel: NoteViewModel) {
 
                 Button(
                     modifier = Modifier.size(40.dp),
-                    onClick = { },
+                    onClick = {
+                        router.navigate(NoteRoute.AddNote.name)
+                    },
                     shape = RoundedCornerShape(20.dp),
                     contentPadding = PaddingValues(5.dp)
                 ) {
@@ -72,19 +76,19 @@ fun MainScreen(viewModel: NoteViewModel) {
 // TODO: This does not seem right, but I could not find any info about non 3rd party solution
 @OptIn(ExperimentalWearMaterialApi::class)
 @Composable
-fun ContentView(modifier: Modifier = Modifier, viewModel: NoteViewModel) {
+fun ContentView(modifier: Modifier = Modifier, viewModel: NoteListViewModel) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) {
-        viewModel.onIntent(NoteIntent.LoadNotes)
+        viewModel.onIntent(NoteListIntent.LoadNoteList)
     }
 
     PullToRefreshBox(
         modifier = modifier,
-        isRefreshing = state is NoteState.Loading,
+        isRefreshing = state is NoteListState.Loading,
         contentAlignment = Alignment.BottomEnd,
         onRefresh = {
             // TODO: currently it masks views while loading - do this only for first fetch
-            viewModel.onIntent(NoteIntent.LoadNotes)
+            viewModel.onIntent(NoteListIntent.LoadNoteList)
         },
     ) {
         Column(
@@ -92,13 +96,13 @@ fun ContentView(modifier: Modifier = Modifier, viewModel: NoteViewModel) {
                 .fillMaxSize()
         ) {
             when (val currentState = state) {
-                is NoteState.Loading -> {
+                is NoteListState.Loading -> {
                     LoadingNotesListView(
                         notes = currentState.mockedNotes
                     )
                 }
 
-                is NoteState.Loaded -> {
+                is NoteListState.Loaded -> {
 
                     if (currentState.notes.isEmpty()) {
                         Text(
@@ -112,7 +116,7 @@ fun ContentView(modifier: Modifier = Modifier, viewModel: NoteViewModel) {
                     }
                 }
 
-                is NoteState.Error -> {
+                is NoteListState.Error -> {
                     Text(
                         currentState.errorMessage,
                         color = Color.Red,

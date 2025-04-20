@@ -1,11 +1,8 @@
 package com.example.noteshare.firebase
 
 import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.FirebaseApp
-import dev.gitlive.firebase.app
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.firestore
-import dev.gitlive.firebase.initialize
 
 actual object FirebaseInitializer {
     actual fun initialize(context: Any?) {

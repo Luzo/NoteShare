@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Note(
-    val id: String,
+    val id: String = generateRandomId(),
     val title: String,
     val text: String
 ) {
