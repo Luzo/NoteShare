@@ -15,13 +15,13 @@ import androidx.navigation.NavHostController
 import androidx.compose.ui.Modifier
 import com.example.noteshare.notes.addNote.AddNoteIntent
 import com.example.noteshare.notes.addNote.AddNoteViewModel
+import com.example.noteshare.notes.list.presentation.NoteListIntent
 import com.example.noteshare.notes.model.Note
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNoteScreen(
     viewModel: AddNoteViewModel,
-    router: NavHostController
 ) {
     var title by remember { mutableStateOf("") }
     var text by remember { mutableStateOf("") }
@@ -32,7 +32,7 @@ fun AddNoteScreen(
                 title = { Text("Add Note") },
                 navigationIcon = {
                     IconButton(onClick = {
-                        router.popBackStack()
+                        viewModel.sendIntent(AddNoteIntent.GoBackTapped)
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
@@ -75,9 +75,6 @@ fun AddNoteScreen(
                         text = text
                     )
                     viewModel.sendIntent(AddNoteIntent.AddNote(newNote))
-                    // TODO: this behaviour is incorrect, add some view model for navigation
-                    // Possible workaround would be sending events from AddNoteViewModel
-                    router.popBackStack()
                 },
                 modifier = Modifier.align(Alignment.End),
                 enabled = title.isNotBlank() && text.isNotBlank()

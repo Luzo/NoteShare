@@ -1,6 +1,8 @@
 package com.example.noteshare.notes.list.presentation
 import com.example.noteshare.notes.model.Note
 import com.example.noteshare.notes.list.model.NoteListState
+import com.example.noteshare.notes.navigation.NoteRoute
+import com.example.noteshare.notes.navigation.NoteRouterViewModel
 import com.example.noteshare.notes.shared.usecase.LoadNotesUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class NoteListViewModel(
-    private val loadNotesUseCase: LoadNotesUseCase = LoadNotesUseCase()
+    private val loadNotesUseCase: LoadNotesUseCase = LoadNotesUseCase(),
+    private val router: NoteRouterViewModel,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val _state = MutableStateFlow<NoteListState>(
@@ -22,7 +25,7 @@ class NoteListViewModel(
     ))
     val state: StateFlow<NoteListState> = _state.asStateFlow()
 
-    fun onIntent(intent: NoteListIntent) {
+    fun sendIntent(intent: NoteListIntent) {
         when (intent) {
             is NoteListIntent.LoadNoteList -> {
                 val mockedNotes = List(3) { Note.mock() }
@@ -31,6 +34,9 @@ class NoteListViewModel(
                 scope.launch {
                     loadNotes()
                 }
+            }
+            is NoteListIntent.AddNoteTapped -> {
+                router.navigateTo(NoteRoute.AddNote)
             }
         }
     }

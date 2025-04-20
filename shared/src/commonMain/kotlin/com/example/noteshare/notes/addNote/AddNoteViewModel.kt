@@ -1,5 +1,7 @@
 package com.example.noteshare.notes.addNote
 import com.example.noteshare.notes.model.Note
+import com.example.noteshare.notes.navigation.NoteRoute
+import com.example.noteshare.notes.navigation.NoteRouterViewModel
 import com.example.noteshare.notes.shared.usecase.AddNoteUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,6 +13,7 @@ import kotlinx.coroutines.launch
 
 class AddNoteViewModel(
     private val addNoteUseCase: AddNoteUseCase = AddNoteUseCase(),
+    private val router: NoteRouterViewModel,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val _state = MutableStateFlow<AddNoteState>(AddNoteState.Idle)
@@ -24,6 +27,7 @@ class AddNoteViewModel(
                     try {
                         addNoteUseCase.execute(intent.note)
                         _state.value = AddNoteState.Success
+                        router.popBack()
                     } catch (e: Exception) {
                         _state.value = AddNoteState.Error(e.message ?: "Something went wrong")
                     }
@@ -31,6 +35,9 @@ class AddNoteViewModel(
             }
             is AddNoteIntent.Reset -> {
                 _state.value = AddNoteState.Idle
+            }
+            is AddNoteIntent.GoBackTapped -> {
+                router.popBack()
             }
         }
     }

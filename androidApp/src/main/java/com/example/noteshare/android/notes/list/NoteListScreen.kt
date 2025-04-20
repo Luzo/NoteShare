@@ -22,7 +22,6 @@ import androidx.navigation.NavHostController
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import androidx.wear.compose.material.placeholder
 import androidx.wear.compose.material.rememberPlaceholderState
-import com.example.noteshare.android.NoteRoute
 import com.example.noteshare.notes.model.Note
 import com.example.noteshare.notes.list.model.NoteListState
 import com.example.noteshare.notes.list.presentation.NoteListIntent
@@ -30,7 +29,7 @@ import com.example.noteshare.notes.list.presentation.NoteListViewModel
 import androidx.compose.runtime.DisposableEffect
 
 @Composable
-fun NotesScreen(viewModel: NoteListViewModel, router: NavHostController) {
+fun NotesScreen(viewModel: NoteListViewModel) {
     DisposableEffect(Unit) {
         onDispose {
             viewModel.cancelScope()
@@ -56,7 +55,7 @@ fun NotesScreen(viewModel: NoteListViewModel, router: NavHostController) {
                 Button(
                     modifier = Modifier.size(40.dp),
                     onClick = {
-                        router.navigate(NoteRoute.AddNote.name)
+                        viewModel.sendIntent(NoteListIntent.AddNoteTapped)
                     },
                     shape = RoundedCornerShape(20.dp),
                     contentPadding = PaddingValues(5.dp)
@@ -79,7 +78,7 @@ fun NotesScreen(viewModel: NoteListViewModel, router: NavHostController) {
 fun ContentView(modifier: Modifier = Modifier, viewModel: NoteListViewModel) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) {
-        viewModel.onIntent(NoteListIntent.LoadNoteList)
+        viewModel.sendIntent(NoteListIntent.LoadNoteList)
     }
 
     PullToRefreshBox(
@@ -88,7 +87,7 @@ fun ContentView(modifier: Modifier = Modifier, viewModel: NoteListViewModel) {
         contentAlignment = Alignment.BottomEnd,
         onRefresh = {
             // TODO: currently it masks views while loading - do this only for first fetch
-            viewModel.onIntent(NoteListIntent.LoadNoteList)
+            viewModel.sendIntent(NoteListIntent.LoadNoteList)
         },
     ) {
         Column(
