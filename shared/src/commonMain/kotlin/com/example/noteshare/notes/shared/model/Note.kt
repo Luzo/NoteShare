@@ -5,10 +5,19 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Note(
-    val id: String = generateRandomId(),
+    val id: String,
     val title: String,
     val text: String
 ) {
+    constructor(
+        title: String,
+        text: String
+    ): this(
+        id = generateRandomId(),
+        title = title,
+        text = text
+    )
+
     companion object {
         fun mock(): Note {
             return Note(

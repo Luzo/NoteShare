@@ -12,6 +12,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class NoteListViewModel(
@@ -44,7 +45,7 @@ class NoteListViewModel(
     // NOTE: Only used for iOS
     fun collectState(collector: (NoteListState) -> Unit) {
         scope.launch(Dispatchers.Main) {
-            state.collect(collector)
+            state.collectLatest { collector(it) }
         }
     }
 

@@ -1,4 +1,5 @@
 package com.example.noteshare.notes.addNote
+import com.example.noteshare.notes.list.model.NoteListState
 import com.example.noteshare.notes.model.Note
 import com.example.noteshare.notes.navigation.NoteRoute
 import com.example.noteshare.notes.navigation.NoteRouterViewModel
@@ -9,6 +10,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class AddNoteViewModel(
@@ -39,6 +41,13 @@ class AddNoteViewModel(
             is AddNoteIntent.GoBackTapped -> {
                 router.popBack()
             }
+        }
+    }
+
+    // NOTE: Only used for iOS
+    fun collectState(collector: (AddNoteState) -> Unit) {
+        scope.launch(Dispatchers.Main) {
+            state.collectLatest { collector(it) }
         }
     }
 }

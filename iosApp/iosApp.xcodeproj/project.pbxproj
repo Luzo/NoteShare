@@ -10,12 +10,13 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
-		7555FF83242A565900829871 /* NotesScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* NotesScreen.swift */; };
-		E879927C2DA128B100C4C2B5 /* NotesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E879927B2DA128AE00C4C2B5 /* NotesList.swift */; };
 		E8844F482DA3EBB400E3A25E /* View+staticItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8844F472DA3EBA800E3A25E /* View+staticItem.swift */; };
 		E8AC67A22DA95CD0007A3483 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = E8AC67A12DA95CD0007A3483 /* FirebaseCore */; };
 		E8AC67A42DA95CD0007A3483 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = E8AC67A32DA95CD0007A3483 /* FirebaseFirestore */; };
 		E8C0F2B52DA9356300A11810 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E8C0F2B42DA9356300A11810 /* GoogleService-Info.plist */; };
+		E8CCE65D2DB4F02800AB3E1B /* NotesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CCE65B2DB4F02800AB3E1B /* NotesListView.swift */; };
+		E8CCE65E2DB4F02800AB3E1B /* NotesListNotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8CCE65A2DB4F02800AB3E1B /* NotesListNotesView.swift */; };
+		E8EC5DA32DB504D2005EA04B /* AddNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EC5DA22DB504CE005EA04B /* AddNoteView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,11 +37,12 @@
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7555FF82242A565900829871 /* NotesScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesScreen.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E879927B2DA128AE00C4C2B5 /* NotesList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesList.swift; sourceTree = "<group>"; };
 		E8844F472DA3EBA800E3A25E /* View+staticItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+staticItem.swift"; sourceTree = "<group>"; };
 		E8C0F2B42DA9356300A11810 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		E8CCE65A2DB4F02800AB3E1B /* NotesListNotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesListNotesView.swift; sourceTree = "<group>"; };
+		E8CCE65B2DB4F02800AB3E1B /* NotesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesListView.swift; sourceTree = "<group>"; };
+		E8EC5DA22DB504CE005EA04B /* AddNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNoteView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,8 +107,8 @@
 		E879927A2DA128A600C4C2B5 /* Notes */ = {
 			isa = PBXGroup;
 			children = (
-				E879927B2DA128AE00C4C2B5 /* NotesList.swift */,
-				7555FF82242A565900829871 /* NotesScreen.swift */,
+				E8CCE6592DB4F02800AB3E1B /* AddNote */,
+				E8CCE65C2DB4F02800AB3E1B /* List */,
 			);
 			path = Notes;
 			sourceTree = "<group>";
@@ -125,6 +127,23 @@
 				E8844F472DA3EBA800E3A25E /* View+staticItem.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		E8CCE6592DB4F02800AB3E1B /* AddNote */ = {
+			isa = PBXGroup;
+			children = (
+				E8EC5DA22DB504CE005EA04B /* AddNoteView.swift */,
+			);
+			path = AddNote;
+			sourceTree = "<group>";
+		};
+		E8CCE65C2DB4F02800AB3E1B /* List */ = {
+			isa = PBXGroup;
+			children = (
+				E8CCE65A2DB4F02800AB3E1B /* NotesListNotesView.swift */,
+				E8CCE65B2DB4F02800AB3E1B /* NotesListView.swift */,
+			);
+			path = List;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -225,8 +244,9 @@
 			files = (
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				E8844F482DA3EBB400E3A25E /* View+staticItem.swift in Sources */,
-				E879927C2DA128B100C4C2B5 /* NotesList.swift in Sources */,
-				7555FF83242A565900829871 /* NotesScreen.swift in Sources */,
+				E8CCE65D2DB4F02800AB3E1B /* NotesListView.swift in Sources */,
+				E8CCE65E2DB4F02800AB3E1B /* NotesListNotesView.swift in Sources */,
+				E8EC5DA32DB504D2005EA04B /* AddNoteView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

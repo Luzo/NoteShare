@@ -2,65 +2,57 @@ import Combine
 import SwiftUI
 import shared
 
-class NoteViewModelAdapter: ObservableObject {
-  @Published var state: NoteState
-  private let viewModel: NoteViewModel
+class NotesListViewModelAdapter: ObservableObject {
+  @Published var state: NoteListState
+  private let viewModel: NoteListViewModel
 
-  init(viewModel: NoteViewModel) {
+  init(viewModel: NoteListViewModel) {
     self.state = .Loading(mockedNotes: [])
     self.viewModel = viewModel
 
-    viewModel.collectState { state in
-      self.state = state.transform
+    viewModel.collectState { [weak self] state in
+      self?.state = state
     }
   }
 }
 
-// TODO: this is here just for quick debug, remove later
-private extension NoteState {
-  var transform: NoteState {
-    if self is NoteState.Loading {
-      return self
-    }
-
-    return self
-//    return NoteState.Error(errorMessage: "Not loaded")
-//    return NoteState.Loaded(notes: [])
-  }
-}
-
-extension NoteViewModelAdapter {
+extension NotesListViewModelAdapter {
   func loadNotes() async {
-    viewModel.onIntent(intent: NoteIntent.LoadNotes())
+    await MainActor.run {
+      viewModel.sendIntent(intent: NoteListIntent.LoadNoteList())
+    }
     await checkLoaded()
   }
 
   private func checkLoaded() async {
-    if state is NoteState.Loading {
+    if state is NoteListState.Loading {
       try? await Task.sleep(for: .seconds(1))
       await checkLoaded()
     }
 
     try? await Task.sleep(for: .seconds(1))
   }
+
+  func addNoteTapped() {
+    viewModel.sendIntent(intent: NoteListIntent.AddNoteTapped())
+  }
 }
 
-struct NotesScreen: View {
-  @ObservedObject var viewModel: NoteViewModelAdapter
+struct NotesListView: View {
+  @StateObject var viewModel: NotesListViewModelAdapter
 
   var body: some View {
-    NavigationStack {
       ZStack(alignment: .bottom) {
         List {
           switch viewModel.state {
-          case let loadingState as NoteState.Loading:
-            NotesListView(viewModel: .init(notes: loadingState.mockedNotes))
+          case let loadingState as NoteListState.Loading:
+            NotesListNotesView(viewModel: .init(notes: loadingState.mockedNotes))
               .redacted(reason: .placeholder)
 
-          case let loadedState as NoteState.Loaded:
-            NotesListView(viewModel: .init(notes: loadedState.notes))
+          case let loadedState as NoteListState.Loaded:
+            NotesListNotesView(viewModel: .init(notes: loadedState.notes))
 
-          case let errorState as NoteState.Error:
+          case let errorState as NoteListState.Error:
             Text(errorState.errorMessage)
               .foregroundColor(.red)
               .asStaticItem()
@@ -81,7 +73,7 @@ struct NotesScreen: View {
       .navigationTitle("Your notes")
       .toolbar {
         Button(action: {
-          // TODO: add item
+          viewModel.addNoteTapped()
         }) {
           Image(systemName: "plus")
             .padding(4)
@@ -90,7 +82,9 @@ struct NotesScreen: View {
             .clipShape(Circle())
         }
       }
-    }
+      .onChange(of: viewModel.state, perform: { newValue in
+        print("State changed to: \(newValue)")
+      })
   }
 }
 

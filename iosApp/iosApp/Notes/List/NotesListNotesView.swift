@@ -2,7 +2,7 @@ import SwiftUI
 import shared
 
 
-class NotesListViewModel: ObservableObject {
+class NotesListNotesViewModel: ObservableObject {
   @Published var state: [Note]
 
   init(notes: [Note]) {
@@ -10,8 +10,8 @@ class NotesListViewModel: ObservableObject {
   }
 }
 
-struct NotesListView: View {
-  @ObservedObject var viewModel: NotesListViewModel
+struct NotesListNotesView: View {
+  @ObservedObject var viewModel: NotesListNotesViewModel
 
   var body: some View {
     if viewModel.state.isEmpty {
