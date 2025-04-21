@@ -4,7 +4,9 @@ package com.example.noteshare.android.notes.list
 
 import LoadingNotesListView
 import NotesListView
+import android.widget.ScrollView
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -100,23 +103,36 @@ fun ContentView(modifier: Modifier = Modifier, viewModel: NoteListViewModel) {
                 is NoteListState.Loaded -> {
 
                     if (currentState.notes.isEmpty()) {
-                        Text(
-                            "No notes available.",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.Gray,
-                            modifier = Modifier.padding(16.dp)
-                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                "No notes available.",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.Gray
+                            )
+                        }
                     } else {
                         NotesListView(notes = currentState.notes, viewModel = viewModel)
                     }
                 }
 
                 is NoteListState.Error -> {
-                    Text(
-                        currentState.errorMessage,
-                        color = Color.Red,
-                        modifier = Modifier.padding(16.dp)
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp)
+                    ) {
+                        Text(
+                            currentState.errorMessage,
+                            color = Color.Red,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
                 }
 
                 else -> {
