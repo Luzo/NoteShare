@@ -3,6 +3,7 @@ import com.example.noteshare.notes.model.Note
 import com.example.noteshare.notes.list.model.NoteListState
 import com.example.noteshare.notes.navigation.NoteRoute
 import com.example.noteshare.notes.navigation.NoteRouterViewModel
+import com.example.noteshare.notes.shared.usecase.DeleteNoteUseCase
 import com.example.noteshare.notes.shared.usecase.LoadNotesUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 
 class NoteListViewModel(
     private val loadNotesUseCase: LoadNotesUseCase = LoadNotesUseCase(),
+    private val deleteNotesUseCase: DeleteNoteUseCase = DeleteNoteUseCase(),
     private val router: NoteRouterViewModel,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -39,6 +41,11 @@ class NoteListViewModel(
             is NoteListIntent.AddNoteTapped -> {
                 router.navigateTo(NoteRoute.AddNote)
             }
+            is NoteListIntent.DeleteNoteTapped -> {
+                scope.launch {
+                    deleteNote(intent.note)
+                }
+            }
         }
     }
 
@@ -55,12 +62,18 @@ class NoteListViewModel(
 
     private suspend fun NoteListViewModel.loadNotes() {
         try {
-            // Load notes from use case
             val notes = loadNotesUseCase.execute()
-            // Update state to Loaded with real notes
             _state.value = NoteListState.Loaded(notes)
         } catch (e: Exception) {
-            // Handle error by updating state
+            _state.value = NoteListState.Error("Failed to load notes: ${e.message}")
+        }
+    }
+
+    private suspend fun NoteListViewModel.deleteNote(note: Note) {
+        try {
+            deleteNotesUseCase.execute(note)
+            loadNotes()
+        } catch (e: Exception) {
             _state.value = NoteListState.Error("Failed to load notes: ${e.message}")
         }
     }

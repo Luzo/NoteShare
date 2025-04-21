@@ -36,6 +36,10 @@ extension NotesListViewModelAdapter {
   func addNoteTapped() {
     viewModel.sendIntent(intent: NoteListIntent.AddNoteTapped())
   }
+
+  func deleteNoteTapped(note: Note) {
+    viewModel.sendIntent(intent: NoteListIntent.DeleteNoteTapped(note: note))
+  }
 }
 
 struct NotesListView: View {
@@ -50,7 +54,10 @@ struct NotesListView: View {
               .redacted(reason: .placeholder)
 
           case let loadedState as NoteListState.Loaded:
-            NotesListNotesView(viewModel: .init(notes: loadedState.notes))
+            NotesListNotesView(
+              viewModel: .init(notes: loadedState.notes),
+              onDelete: viewModel.deleteNoteTapped
+            )
 
           case let errorState as NoteListState.Error:
             Text(errorState.errorMessage)

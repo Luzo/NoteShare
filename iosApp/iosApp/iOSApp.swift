@@ -51,6 +51,7 @@ struct AppNavigation: View {
         viewModel: .init(
           viewModel: NoteListViewModel(
             loadNotesUseCase: .init(),
+            deleteNotesUseCase: .init(),
             router: router.viewModel
           )
         )

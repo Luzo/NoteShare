@@ -13,3 +13,9 @@ class AddNoteUseCase {
         return FirestoreWrapper.add<Note>(note, "notes")
     }
 }
+
+class DeleteNoteUseCase {
+    suspend fun execute(note: Note) {
+        return FirestoreWrapper.delete<Note>(note, "notes")
+    }
+}

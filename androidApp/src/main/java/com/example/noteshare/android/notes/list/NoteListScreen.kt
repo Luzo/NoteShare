@@ -2,6 +2,8 @@
 
 package com.example.noteshare.android.notes.list
 
+import LoadingNotesListView
+import NotesListView
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -11,18 +13,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.shadow
-import androidx.navigation.NavHostController
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
-import androidx.wear.compose.material.placeholder
-import androidx.wear.compose.material.rememberPlaceholderState
-import com.example.noteshare.notes.model.Note
 import com.example.noteshare.notes.list.model.NoteListState
 import com.example.noteshare.notes.list.presentation.NoteListIntent
 import com.example.noteshare.notes.list.presentation.NoteListViewModel
@@ -111,7 +107,7 @@ fun ContentView(modifier: Modifier = Modifier, viewModel: NoteListViewModel) {
                             modifier = Modifier.padding(16.dp)
                         )
                     } else {
-                        NotesListView(notes = currentState.notes)
+                        NotesListView(notes = currentState.notes, viewModel = viewModel)
                     }
                 }
 
@@ -127,71 +123,6 @@ fun ContentView(modifier: Modifier = Modifier, viewModel: NoteListViewModel) {
 
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun LoadingNotesListView(modifier: Modifier = Modifier, notes: List<Note>) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 8.dp)
-        ,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.Start
-    ) {
-        items(notes) { note ->
-            NoteItem(true, note)
-        }
-    }
-}
-
-@Composable
-fun NotesListView(notes: List<Note>) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 8.dp)
-        ,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.Start
-    ) {
-        items(notes) { note ->
-            NoteItem(isLoading = false, note)
-        }
-    }
-}
-
-@Composable
-fun NoteItem(isLoading: Boolean, note: Note) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .shadow(elevation = 4.dp),
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Text(
-                modifier = Modifier.placeholder(
-                    placeholderState = rememberPlaceholderState { !isLoading }
-                ),
-                text = note.title,
-                style = MaterialTheme.typography.titleMedium,
-            )
-
-            Text(
-                modifier = Modifier.placeholder(
-                    placeholderState = rememberPlaceholderState { !isLoading }
-                ),
-                text = note.text,
-                style = MaterialTheme.typography.bodyMedium,
-            )
         }
     }
 }

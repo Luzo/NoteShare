@@ -12,6 +12,7 @@ class NotesListNotesViewModel: ObservableObject {
 
 struct NotesListNotesView: View {
   @ObservedObject var viewModel: NotesListNotesViewModel
+  var onDelete: ((Note) -> Void)? = nil
 
   var body: some View {
     if viewModel.state.isEmpty {
@@ -28,6 +29,10 @@ struct NotesListNotesView: View {
             .font(.subheadline)
         }
         .padding()
+      }
+      .onDelete {
+        guard let index = $0.first else { return }
+        onDelete?(viewModel.state[index])
       }
     }
   }

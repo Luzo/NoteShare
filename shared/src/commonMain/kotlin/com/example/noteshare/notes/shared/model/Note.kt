@@ -4,11 +4,16 @@ import kotlin.uuid.Uuid
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Note(
-    val id: String,
+sealed interface Identifiable {
+    val id: String
+}
+
+@Serializable
+data class Note (
+    override val id: String,
     val title: String,
     val text: String
-) {
+): Identifiable {
     constructor(
         title: String,
         text: String
