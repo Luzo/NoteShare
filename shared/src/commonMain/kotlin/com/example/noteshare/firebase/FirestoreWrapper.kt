@@ -1,6 +1,9 @@
 package com.example.noteshare.firebase
 
 import com.example.noteshare.notes.model.Identifiable
+import dev.gitlive.firebase.firestore.where
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 object FirestoreWrapper {
     suspend inline fun <reified T : Identifiable>loadDocuments(collectionPath: String): List<T> {
@@ -9,7 +12,6 @@ object FirestoreWrapper {
             .get()
             .documents
             .map {
-                it.reference.id
                 it.data<T>()
             }
     }
@@ -26,5 +28,17 @@ object FirestoreWrapper {
             .collection(collectionPath)
             .document(item.id)
             .delete()
+    }
+
+    inline fun <reified T : Identifiable>observeChanges(collectionPath: String): Flow<List<T>> {
+        return FirebaseInitializer.firestore
+            .collection(collectionPath)
+            .snapshots
+            .map {
+                it.documents
+                    .map {
+                        it.data<T>()
+                    }
+            }
     }
 }

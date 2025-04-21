@@ -49,11 +49,7 @@ struct AppNavigation: View {
     case .noteslist:
       NotesListView(
         viewModel: .init(
-          viewModel: NoteListViewModel(
-            loadNotesUseCase: .init(),
-            deleteNotesUseCase: .init(),
-            router: router.viewModel
-          )
+          viewModel: NoteListViewModel(router: router.viewModel)
         )
       )
       .transition(transition(forDirection: route.second))
@@ -62,7 +58,6 @@ struct AppNavigation: View {
       AddNoteView(
         viewModel: .init(
           viewModel: AddNoteViewModel(
-            addNoteUseCase: .init(),
             router: router.viewModel
           )
         )

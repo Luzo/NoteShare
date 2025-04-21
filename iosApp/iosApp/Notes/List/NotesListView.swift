@@ -17,6 +17,10 @@ class NotesListViewModelAdapter: ObservableObject {
 }
 
 extension NotesListViewModelAdapter {
+  func observeNotes() {
+    viewModel.sendIntent(intent: NoteListIntent.ObserveNoteChanges())
+  }
+
   func loadNotes() async {
     await MainActor.run {
       viewModel.sendIntent(intent: NoteListIntent.LoadNoteList())
@@ -73,6 +77,8 @@ struct NotesListView: View {
         Task {
           await viewModel.loadNotes()
         }
+
+        viewModel.observeNotes()
       }
       .refreshable {
         await viewModel.loadNotes()

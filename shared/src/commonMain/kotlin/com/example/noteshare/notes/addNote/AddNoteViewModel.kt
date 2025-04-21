@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class AddNoteViewModel(
-    private val addNoteUseCase: AddNoteUseCase = AddNoteUseCase(),
     private val router: NoteRouterViewModel,
 ) {
+    private val addNoteUseCase: AddNoteUseCase = AddNoteUseCase()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val _state = MutableStateFlow<AddNoteState>(AddNoteState.Idle)
     val state: StateFlow<AddNoteState> = _state.asStateFlow()

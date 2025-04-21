@@ -78,6 +78,7 @@ fun ContentView(modifier: Modifier = Modifier, viewModel: NoteListViewModel) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(Unit) {
         viewModel.sendIntent(NoteListIntent.LoadNoteList)
+        viewModel.sendIntent(NoteListIntent.ObserveNoteChanges)
     }
 
     PullToRefreshBox(

@@ -5,6 +5,7 @@ import com.example.noteshare.notes.navigation.NoteRoute
 import com.example.noteshare.notes.navigation.NoteRouterViewModel
 import com.example.noteshare.notes.shared.usecase.DeleteNoteUseCase
 import com.example.noteshare.notes.shared.usecase.LoadNotesUseCase
+import com.example.noteshare.notes.shared.usecase.ObserveNoteUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -17,15 +18,18 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class NoteListViewModel(
-    private val loadNotesUseCase: LoadNotesUseCase = LoadNotesUseCase(),
-    private val deleteNotesUseCase: DeleteNoteUseCase = DeleteNoteUseCase(),
     private val router: NoteRouterViewModel,
 ) {
+    // TODO: Loading is probably unnecessary since we observe the changes - we just nee to switch state to Loading....
+    private val loadNotesUseCase: LoadNotesUseCase = LoadNotesUseCase()
+    private val deleteNotesUseCase: DeleteNoteUseCase = DeleteNoteUseCase()
+    private val observeNotesUseCase: ObserveNoteUseCase = ObserveNoteUseCase()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val _state = MutableStateFlow<NoteListState>(
         NoteListState.Loading(
-        listOf(Note.mock(), Note.mock(), Note.mock())
-    ))
+            listOf(Note.mock(), Note.mock(), Note.mock())
+        )
+    )
     val state: StateFlow<NoteListState> = _state.asStateFlow()
 
     fun sendIntent(intent: NoteListIntent) {
@@ -38,12 +42,20 @@ class NoteListViewModel(
                     loadNotes()
                 }
             }
+
             is NoteListIntent.AddNoteTapped -> {
                 router.navigateTo(NoteRoute.AddNote)
             }
+
             is NoteListIntent.DeleteNoteTapped -> {
                 scope.launch {
                     deleteNote(intent.note)
+                }
+            }
+
+            is NoteListIntent.ObserveNoteChanges -> {
+                scope.launch {
+                    observeNotes()
                 }
             }
         }
@@ -72,9 +84,15 @@ class NoteListViewModel(
     private suspend fun NoteListViewModel.deleteNote(note: Note) {
         try {
             deleteNotesUseCase.execute(note)
-            loadNotes()
         } catch (e: Exception) {
             _state.value = NoteListState.Error("Failed to load notes: ${e.message}")
         }
+    }
+
+    private suspend fun NoteListViewModel.observeNotes() {
+        observeNotesUseCase.execute()
+            .collectLatest {
+                _state.value = NoteListState.Loaded(it)
+            }
     }
 }
