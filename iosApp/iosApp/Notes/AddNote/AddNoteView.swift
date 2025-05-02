@@ -59,6 +59,7 @@ struct AddNoteView: View {
     }
     .disabled(viewModel.state is AddNoteState.Loading)
     .navigationTitle("New Note")
+    .navigationBarBackButtonHidden()
     .toolbar {
       ToolbarItem(placement: .cancellationAction) {
         Button("Cancel") {

@@ -15,45 +15,80 @@ struct iOSApp: App {
   }
 }
 
+import Foundation
+import shared
+import SwiftUI
+
+@MainActor
 class NoteRouterViewModelAdapter: ObservableObject {
-  @Published var state: KotlinPair<NoteRoute, NavigationDirection>
   let viewModel: NoteRouterViewModel
+  @Published var path = NavigationPath()
+  @Published var root: NoteRoute = .noteslist
+  @Published var direction: NavigationDirection = .forward
 
   init(viewModel: NoteRouterViewModel) {
-    self.state = .init(first: NoteRoute.noteslist, second: nil)
     self.viewModel = viewModel
+    viewModel.collectState { [weak self] state in
+      guard
+        let self,
+        let route = state.first,
+        let direction = state.second
+      else { return }
 
-    viewModel.collectState { state in
-      self.state = state
+      self.updatePath(for: route, direction: direction)
     }
+  }
+
+  private func updatePath(for route: NoteRoute, direction: NavigationDirection) {
+    self.direction = direction
+
+    switch route {
+    case .noteslist:
+      path = NavigationPath()
+      root = .noteslist
+    default:
+      if direction == .forward {
+        path.append(route)
+      } else if direction == .backward {
+        path.removeLast()
+      }
+    }
+  }
+
+  func navigateTo(_ route: NoteRoute) {
+    viewModel.navigateTo(screen: route, direction: .forward)
+  }
+
+  func popBack() {
+    viewModel.popBack()
+  }
+
+  func resetToRoot() {
+    viewModel.resetToRoot()
   }
 }
 
 struct AppNavigation: View {
   @StateObject private var router = NoteRouterViewModelAdapter(viewModel: .init())
-  @Namespace private var animation
 
   var body: some View {
-    NavigationStack {
-      view(forRoute: router.state)
-        .navigationDestination(for: KotlinPair<NoteRoute, NavigationDirection>.self) { route in
-          view(forRoute: route)
+    NavigationStack(path: $router.path) {
+      screenView(for: router.root)
+        .navigationDestination(for: NoteRoute.self) { route in
+          screenView(for: route)
         }
     }
-    .animation(.easeInOut(duration: 0.5), value: router.state)
   }
 
   @ViewBuilder
-  func view(forRoute route: KotlinPair<NoteRoute, NavigationDirection>) -> some View {
-    switch route.first {
+  func screenView(for route: NoteRoute) -> some View {
+    switch route {
     case .noteslist:
       NotesListView(
         viewModel: .init(
           viewModel: NoteListViewModel(router: router.viewModel)
         )
       )
-      .transition(transition(forDirection: route.second))
-
     case .addnote:
       AddNoteView(
         viewModel: .init(
@@ -62,21 +97,8 @@ struct AppNavigation: View {
           )
         )
       )
-      .transition(transition(forDirection: route.second))
-
     default:
-      EmptyView()
-    }
-  }
-
-  private func transition(forDirection direction: NavigationDirection?) -> AnyTransition {
-    switch direction {
-    case .forward:
-      return .move(edge: .trailing)
-    case .backward:
-      return .move(edge: .leading)
-    default:
-      return .opacity
+      fatalError("Not expected route")
     }
   }
 }
