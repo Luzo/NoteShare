@@ -3,8 +3,8 @@ import com.example.noteshare.firebase.FirestoreWrapper
 import com.example.noteshare.notes.model.Note
 import kotlinx.coroutines.flow.Flow
 
-class LoadNotesUseCase {
-    suspend fun execute(): List<Note> {
+open class LoadNotesUseCase {
+    open suspend fun execute(): List<Note> {
         return FirestoreWrapper.loadDocuments<Note>("notes")
     }
 }
@@ -15,14 +15,14 @@ class AddNoteUseCase {
     }
 }
 
-class DeleteNoteUseCase {
-    suspend fun execute(note: Note) {
+open class DeleteNoteUseCase {
+    open suspend fun execute(note: Note) {
         return FirestoreWrapper.delete<Note>(note, "notes")
     }
 }
 
-class ObserveNoteUseCase {
-    fun execute(): Flow<List<Note>> {
+open class ObserveNoteUseCase {
+    open fun execute(): Flow<List<Note>> {
         return FirestoreWrapper.observeChanges<Note>("notes")
     }
 }

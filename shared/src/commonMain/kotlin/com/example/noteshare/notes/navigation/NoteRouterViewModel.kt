@@ -20,7 +20,7 @@ enum class NavigationDirection(val value: Int) {
     Backward(-1)
 }
 
-class NoteRouterViewModel {
+open class NoteRouterViewModel {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val _backstack = mutableListOf<NoteRoute>(NoteRoute.NotesList)
 
@@ -30,7 +30,7 @@ class NoteRouterViewModel {
     private val _navigationDirection = MutableStateFlow(NavigationDirection.Forward)
     val navigationDirection: StateFlow<NavigationDirection> = _navigationDirection.asStateFlow()
 
-    fun navigateTo(
+    open fun navigateTo(
         screen: NoteRoute,
         direction: NavigationDirection = NavigationDirection.Forward
     ) {

@@ -31,6 +31,14 @@ data class Note (
                 text = "This is a mock to show text"
             )
         }
+
+        fun mock(id: String = "", title: String = "", text: String = ""): Note {
+            return Note(
+                id = id,
+                title = title,
+                text = text
+            )
+        }
     }
 }
 

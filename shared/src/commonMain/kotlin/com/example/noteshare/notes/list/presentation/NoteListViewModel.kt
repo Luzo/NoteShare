@@ -19,11 +19,11 @@ import kotlinx.coroutines.launch
 
 class NoteListViewModel(
     private val router: NoteRouterViewModel,
+    private val loadNotesUseCase: LoadNotesUseCase = LoadNotesUseCase(),
+    private val deleteNotesUseCase: DeleteNoteUseCase = DeleteNoteUseCase(),
+    private val observeNotesUseCase: ObserveNoteUseCase = ObserveNoteUseCase()
 ) {
     // TODO: Loading is probably unnecessary since we observe the changes - we just nee to switch state to Loading....
-    private val loadNotesUseCase: LoadNotesUseCase = LoadNotesUseCase()
-    private val deleteNotesUseCase: DeleteNoteUseCase = DeleteNoteUseCase()
-    private val observeNotesUseCase: ObserveNoteUseCase = ObserveNoteUseCase()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val _state = MutableStateFlow<NoteListState>(
         NoteListState.Loading(
