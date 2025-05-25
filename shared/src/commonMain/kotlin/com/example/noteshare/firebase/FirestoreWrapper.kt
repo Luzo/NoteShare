@@ -1,11 +1,12 @@
 package com.example.noteshare.firebase
 
 import com.example.noteshare.notes.model.Identifiable
-import dev.gitlive.firebase.firestore.where
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import co.touchlab.skie.configuration.annotations.SuspendInterop
 
 object FirestoreWrapper {
+    @SuspendInterop.Disabled
     suspend inline fun <reified T : Identifiable>loadDocuments(collectionPath: String): List<T> {
         return FirebaseInitializer.firestore
             .collection(collectionPath)
@@ -16,13 +17,15 @@ object FirestoreWrapper {
             }
     }
 
+    @SuspendInterop.Disabled
     suspend inline fun <reified T : Identifiable>add(item: T, collectionPath: String,) {
         FirebaseInitializer.firestore
-            .collection("notes")
+            .collection(collectionPath)
             .document(item.id)
             .set(item)
     }
 
+    @SuspendInterop.Disabled
     suspend inline fun <reified T : Identifiable>delete(item: T, collectionPath: String,) {
         FirebaseInitializer.firestore
             .collection(collectionPath)

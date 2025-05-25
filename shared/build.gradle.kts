@@ -4,6 +4,7 @@ plugins {
     kotlin("multiplatform") version "2.1.0"
     kotlin("plugin.serialization") version "2.1.0"
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.skie)
 }
 
 kotlin {
@@ -33,6 +34,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.firebase.firestore)
+            implementation(libs.skie.annotations)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

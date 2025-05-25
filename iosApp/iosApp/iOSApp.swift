@@ -23,7 +23,7 @@ import SwiftUI
 class NoteRouterViewModelAdapter: ObservableObject {
   let viewModel: NoteRouterViewModel
   @Published var path = NavigationPath()
-  @Published var root: NoteRoute = .noteslist
+  @Published var root: NoteRoute = .notesList
   @Published var direction: NavigationDirection = .forward
 
   init(viewModel: NoteRouterViewModel) {
@@ -31,8 +31,8 @@ class NoteRouterViewModelAdapter: ObservableObject {
     viewModel.collectState { [weak self] state in
       guard
         let self,
-        let route = state.first,
-        let direction = state.second
+        let route = state.first?.toSwiftEnum(),
+        let direction = state.second?.toSwiftEnum()
       else { return }
 
       self.updatePath(for: route, direction: direction)
@@ -43,9 +43,9 @@ class NoteRouterViewModelAdapter: ObservableObject {
     self.direction = direction
 
     switch route {
-    case .noteslist:
+    case .notesList:
       path = NavigationPath()
-      root = .noteslist
+      root = .notesList
     default:
       if direction == .forward {
         path.append(route)
@@ -83,7 +83,7 @@ struct AppNavigation: View {
   @ViewBuilder
   func screenView(for route: NoteRoute) -> some View {
     switch route {
-    case .noteslist:
+    case .notesList:
       NotesListView(
         viewModel: .init(
           viewModel: NoteListViewModel(
@@ -94,7 +94,7 @@ struct AppNavigation: View {
           )
         )
       )
-    case .addnote:
+    case .addNote:
       AddNoteView(
         viewModel: .init(
           viewModel: AddNoteViewModel(
@@ -102,8 +102,6 @@ struct AppNavigation: View {
           )
         )
       )
-    default:
-      fatalError("Not expected route")
     }
   }
 }
