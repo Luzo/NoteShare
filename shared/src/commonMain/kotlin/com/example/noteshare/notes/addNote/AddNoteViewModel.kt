@@ -43,11 +43,4 @@ class AddNoteViewModel(
             }
         }
     }
-
-    // NOTE: Only used for iOS
-    fun collectState(collector: (AddNoteState) -> Unit) {
-        scope.launch(Dispatchers.Main) {
-            state.collectLatest { collector(it) }
-        }
-    }
 }

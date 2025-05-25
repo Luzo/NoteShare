@@ -12,9 +12,15 @@ class AddNoteViewModelAdapter: ObservableObject {
   init(viewModel: AddNoteViewModel) {
     self.viewModel = viewModel
 
-    viewModel.collectState { [weak self] newState in
-      DispatchQueue.main.async {
-        self?.state = newState
+    Task {
+      await observeState()
+    }
+  }
+
+  private func observeState() async {
+    for try await state in viewModel.state {
+      await MainActor.run {
+        self.state = state
       }
     }
   }

@@ -5,13 +5,22 @@ import shared
 class NotesListViewModelAdapter: ObservableObject {
   @Published var state: NoteListState
   private let viewModel: NoteListViewModel
+//  private var observeTask: Task<Void, Never>?
 
   init(viewModel: NoteListViewModel) {
     self.state = .Loading(mockedNotes: [])
     self.viewModel = viewModel
 
-    viewModel.collectState { [weak self] state in
-      self?.state = state
+    Task {
+      await observeState()
+    }
+  }
+
+  private func observeState() async {
+    for try await state in viewModel.state {
+      await MainActor.run {
+        self.state = state
+      }
     }
   }
 }

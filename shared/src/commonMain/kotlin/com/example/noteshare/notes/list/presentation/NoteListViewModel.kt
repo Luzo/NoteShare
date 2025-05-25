@@ -61,13 +61,6 @@ class NoteListViewModel(
         }
     }
 
-    // NOTE: Only used for iOS
-    fun collectState(collector: (NoteListState) -> Unit) {
-        scope.launch(Dispatchers.Main) {
-            state.collectLatest { collector(it) }
-        }
-    }
-
     fun cancelScope() {
         scope.cancel()
     }
